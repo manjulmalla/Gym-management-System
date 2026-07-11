@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div><h4 class="page-title mb-0">Attendance</h4><small class="text-muted">{{ today_count }} check-ins today</small></div>
+    <div>
+        <a href="{% url 'attendance:monthly_report' %}" class="btn btn-outline-primary"><i class="bi bi-graph-up me-1"></i>Monthly Report</a>
+        <a href="{% url 'attendance:check_in' %}" class="btn btn-primary"><i class="bi bi-box-arrow-in-right me-1"></i>Check In</a>
+    </div>
+</div>
+
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2">
+        <div class="col-md-10"><input type="date" name="date" value="{{ date }}" class="form-control"></div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filter</button></div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Member</th><th>Date</th><th>Check In</th><th>Check Out</th><th class="text-end">Action</th></tr></thead>
+            <tbody>
+                {% for a in page_obj %}
+                <tr>
+                    <td class="fw-semibold">{{ a.member.full_name }}</td>
+                    <td>{{ a.date }}</td>
+                    <td>{{ a.check_in|time:"H:i"|default:"-" }}</td>
+                    <td>{{ a.check_out|time:"H:i"|default:"-" }}</td>
+                    <td class="text-end">
+                        {% if a.check_in and not a.check_out %}
+                        <a href="{% url 'attendance:check_out' a.pk %}" class="btn btn-sm btn-outline-success">Check Out</a>
+                        {% else %}<span class="text-muted small">—</span>{% endif %}
+                    </td>
+                </tr>
+                {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No attendance records.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="p-3">{% with querystring="date="|add:date %}{% include "partials/pagination.html" %}{% endwith %}</div>
+</div>
+{% endblock %}

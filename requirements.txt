@@ -1,0 +1,5 @@
+# GymPro - Python dependencies
+Django>=5.0,<6.0
+Pillow>=10.0.0          # Image uploads (member/trainer photos)
+reportlab>=4.0.0        # PDF report generation
+python-dotenv>=1.0.0    # Load environment variables from .env

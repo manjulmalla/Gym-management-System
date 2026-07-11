@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Classes{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h4 class="page-title mb-0">Workout Classes</h4>
+    <a href="{% url 'classes:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Class</a>
+</div>
+
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <select name="type" class="form-select">
+                <option value="">All class types</option>
+                {% for value, label in type_choices %}<option value="{{ value }}" {% if type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filter</button></div>
+    </form>
+</div>
+
+<div class="row g-3">
+    {% for c in classes %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card p-4 h-100">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="badge bg-primary-subtle text-primary">{{ c.get_class_type_display }}</span>
+                {% if c.is_full %}<span class="badge bg-danger-subtle text-danger">Full</span>
+                {% else %}<span class="badge bg-success-subtle text-success">{{ c.seats_left }} seats</span>{% endif %}
+            </div>
+            <h6 class="mb-1">{{ c.name }}</h6>
+            <div class="small text-muted mb-3">
+                <div><i class="bi bi-calendar me-2"></i>{{ c.get_day_display }} &middot; {{ c.start_time }}–{{ c.end_time }}</div>
+                <div><i class="bi bi-person-badge me-2"></i>{{ c.trainer.full_name|default:"No trainer" }}</div>
+                <div><i class="bi bi-people me-2"></i>{{ c.enrolled_count }}/{{ c.capacity }} enrolled</div>
+            </div>
+            <div class="mt-auto d-flex gap-2">
+                <a href="{% url 'classes:detail' c.pk %}" class="btn btn-sm btn-outline-secondary flex-fill">View</a>
+                <a href="{% url 'classes:edit' c.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'classes:delete' c.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><div class="card p-5 text-center text-muted">No classes scheduled.</div></div>
+    {% endfor %}
+</div>
+{% endblock %}

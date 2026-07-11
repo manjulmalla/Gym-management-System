@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Memberships{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div><h4 class="page-title mb-0">Memberships</h4><small class="text-muted">{{ page_obj.paginator.count }} total</small></div>
+    <div>
+        <a href="{% url 'memberships:plan_list' %}" class="btn btn-outline-primary">Plans</a>
+        <a href="{% url 'memberships:membership_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Membership</a>
+    </div>
+</div>
+
+{% if expiring %}
+<div class="alert alert-warning">
+    <i class="bi bi-hourglass-split me-2"></i><strong>{{ expiring|length }}</strong> membership(s) expiring within 7 days.
+</div>
+{% endif %}
+
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <select name="status" class="form-select">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filter</button></div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Member</th><th>Plan</th><th>Start</th><th>End</th><th>Days Left</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                {% for m in page_obj %}
+                <tr>
+                    <td class="fw-semibold">{{ m.member.full_name }}</td>
+                    <td>{{ m.plan.name }}</td>
+                    <td>{{ m.start_date }}</td>
+                    <td>{{ m.end_date|default:"-" }}</td>
+                    <td>{% if m.days_remaining > 0 %}{{ m.days_remaining }}{% else %}<span class="text-danger">Expired</span>{% endif %}</td>
+                    <td>
+                        {% if m.status == 'active' %}<span class="badge bg-success-subtle text-success">Active</span>
+                        {% elif m.status == 'expired' %}<span class="badge bg-danger-subtle text-danger">Expired</span>
+                        {% elif m.status == 'pending' %}<span class="badge bg-warning-subtle text-warning">Pending</span>
+                        {% else %}<span class="badge bg-secondary-subtle text-secondary">Cancelled</span>{% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'memberships:membership_renew' m.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-arrow-repeat"></i></a>
+                        <a href="{% url 'memberships:membership_edit' m.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'memberships:membership_delete' m.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}<tr><td colspan="7" class="text-center text-muted py-4">No memberships found.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="p-3">{% with querystring="status="|add:status %}{% include "partials/pagination.html" %}{% endwith %}</div>
+</div>
+{% endblock %}

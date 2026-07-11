@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Check In{% endblock %}
+{% block content %}
+<h4 class="page-title mb-4">Member Check-In</h4>
+<div class="row justify-content-center"><div class="col-lg-6"><div class="card p-4">
+    <form method="post">
+        {% csrf_token %}
+        <label class="form-label">Select Member</label>
+        <select name="member" class="form-select mb-3" required>
+            <option value="">-- Choose a member --</option>
+            {% for m in members %}<option value="{{ m.pk }}">{{ m.full_name }} ({{ m.membership_id }})</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Check In</button>
+        <a href="{% url 'attendance:list' %}" class="btn btn-outline-secondary w-100 mt-2">Back</a>
+    </form>
+</div></div></div>
+{% endblock %}

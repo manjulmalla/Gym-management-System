@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="page-title mb-0">Dashboard</h4>
+        <small class="text-muted">Welcome back, {{ user.display_name }}!</small>
+    </div>
+</div>
+
+<!-- KPI cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="value">{{ total_members }}</div>
+                    <div class="label">Total Members</div>
+                </div>
+                <div class="icon bg-grad-blue"><i class="bi bi-people-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="value">{{ active_members }}</div>
+                    <div class="label">Active Members</div>
+                </div>
+                <div class="icon bg-grad-green"><i class="bi bi-person-check-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="value">{{ total_trainers }}</div>
+                    <div class="label">Trainers</div>
+                </div>
+                <div class="icon bg-grad-purple"><i class="bi bi-person-badge-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="value">${{ monthly_revenue|floatformat:0|intcomma }}</div>
+                    <div class="label">Monthly Revenue</div>
+                </div>
+                <div class="icon bg-grad-orange"><i class="bi bi-cash-stack"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="value">{{ attendance_today }}</div>
+                    <div class="label">Attendance Today</div>
+                </div>
+                <div class="icon bg-grad-teal"><i class="bi bi-calendar-check-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="value">{{ expiring|length }}</div>
+                    <div class="label">Expiring Soon</div>
+                </div>
+                <div class="icon bg-grad-red"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card p-3 h-100">
+            <h6 class="mb-3">Revenue (last 6 months)</h6>
+            <canvas id="revenueChart" height="110"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card p-3 h-100">
+            <h6 class="mb-3">Equipment Status</h6>
+            <canvas id="equipmentChart" height="180"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="card p-3 h-100">
+            <h6 class="mb-3">Attendance (last 7 days)</h6>
+            <canvas id="attendanceChart" height="130"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-3 h-100">
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="mb-0">Expiring Memberships</h6>
+                <a href="{% url 'memberships:membership_list' %}" class="small">View all</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead><tr><th>Member</th><th>Plan</th><th>Expires</th></tr></thead>
+                    <tbody>
+                        {% for m in expiring %}
+                        <tr>
+                            <td>{{ m.member.full_name }}</td>
+                            <td>{{ m.plan.name }}</td>
+                            <td><span class="badge bg-warning-subtle text-warning">{{ m.end_date }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-3">No memberships expiring soon.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card p-3 h-100">
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="mb-0">Recent Payments</h6>
+                <a href="{% url 'payments:list' %}" class="small">View all</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead><tr><th>Invoice</th><th>Member</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for p in recent_payments %}
+                        <tr>
+                            <td>{{ p.invoice_number }}</td>
+                            <td>{{ p.member.full_name }}</td>
+                            <td>${{ p.amount }}</td>
+                            <td><span class="badge bg-success-subtle text-success">{{ p.get_status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-3">No payments yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-3 h-100">
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="mb-0">Upcoming Classes</h6>
+                <a href="{% url 'classes:list' %}" class="small">View all</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead><tr><th>Class</th><th>Day</th><th>Time</th><th>Trainer</th></tr></thead>
+                    <tbody>
+                        {% for c in upcoming_classes %}
+                        <tr>
+                            <td>{{ c.name }}</td>
+                            <td>{{ c.get_day_display }}</td>
+                            <td>{{ c.start_time }}</td>
+                            <td>{{ c.trainer.full_name|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-3">No classes scheduled.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const blue = "#2563eb";
+    // Revenue line chart
+    new Chart(document.getElementById("revenueChart"), {
+        type: "line",
+        data: {
+            labels: {{ revenue_labels|safe }},
+            datasets: [{
+                label: "Revenue ($)",
+                data: {{ revenue_data|safe }},
+                borderColor: blue,
+                backgroundColor: "rgba(37,99,235,0.1)",
+                fill: true, tension: 0.35, borderWidth: 2, pointRadius: 3
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    // Attendance bar chart
+    new Chart(document.getElementById("attendanceChart"), {
+        type: "bar",
+        data: {
+            labels: {{ attendance_labels|safe }},
+            datasets: [{ label: "Check-ins", data: {{ attendance_data|safe }}, backgroundColor: blue, borderRadius: 6 }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+
+    // Equipment doughnut chart
+    new Chart(document.getElementById("equipmentChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Working", "Maintenance", "Repair", "Out of Order"],
+            datasets: [{
+                data: {{ equipment_chart|safe }},
+                backgroundColor: ["#10b981", "#f59e0b", "#ef4444", "#64748b"]
+            }]
+        },
+        options: { plugins: { legend: { position: "bottom" } } }
+    });
+</script>
+{% endblock %}

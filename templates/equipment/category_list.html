@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Equipment Categories{% endblock %}
+
+{% block content %}
+<h4 class="page-title mb-4">Equipment Categories</h4>
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card p-4">
+            <h6 class="mb-3">Add Category</h6>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100">Add</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Name</th><th>Description</th><th>Items</th></tr></thead>
+                    <tbody>
+                        {% for c in categories %}
+                        <tr><td class="fw-semibold">{{ c.name }}</td><td>{{ c.description|default:"-" }}</td><td>{{ c.equipment.count }}</td></tr>
+                        {% empty %}<tr><td colspan="3" class="text-center text-muted py-4">No categories yet.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

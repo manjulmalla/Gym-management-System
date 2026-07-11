@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Trainer Attendance{% endblock %}
+
+{% block content %}
+<h4 class="page-title mb-4">Trainer Attendance</h4>
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card p-4">
+            <h6 class="mb-3">Record Attendance</h6>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100">Save</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead><tr><th>Trainer</th><th>Date</th><th>In</th><th>Out</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for r in page_obj %}
+                        <tr><td>{{ r.trainer.full_name }}</td><td>{{ r.date }}</td><td>{{ r.check_in|default:"-" }}</td><td>{{ r.check_out|default:"-" }}</td>
+                            <td>{% if r.present %}<span class="badge bg-success-subtle text-success">Present</span>{% else %}<span class="badge bg-danger-subtle text-danger">Absent</span>{% endif %}</td></tr>
+                        {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No records.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-3">{% include "partials/pagination.html" %}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

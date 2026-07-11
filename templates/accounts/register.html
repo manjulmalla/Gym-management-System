@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block auth_content %}
+<div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 520px;">
+        <div class="brand"><i class="bi bi-lightning-charge-fill"></i> GymPro</div>
+        <p class="text-center text-muted mb-4">Create your member account</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="form-text small">{{ field.help_text|safe }}</div>{% endif %}
+                {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary w-100 py-2">Create Account</button>
+        </form>
+
+        <p class="text-center text-muted mt-4 mb-0 small">
+            Already registered? <a href="{% url 'accounts:login' %}" class="text-decoration-none">Sign in</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

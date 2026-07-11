@@ -1,0 +1,59 @@
+{% load static %}
+<aside class="sidebar" id="sidebar">
+    <div class="brand">
+        <i class="bi bi-lightning-charge-fill"></i>
+        <span>GymPro</span>
+    </div>
+
+    <nav class="nav flex-column py-2">
+        <div class="nav-section">Main</div>
+        <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name in 'home dashboard' %}active{% endif %}"
+           href="{% url 'dashboard:dashboard' %}">
+            <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        </a>
+
+        <div class="nav-section">Management</div>
+        <a class="nav-link {% if request.resolver_match.namespace == 'members' %}active{% endif %}" href="{% url 'members:list' %}">
+            <i class="bi bi-people-fill"></i> Members
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'trainers' %}active{% endif %}" href="{% url 'trainers:list' %}">
+            <i class="bi bi-person-badge-fill"></i> Trainers
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'memberships' %}active{% endif %}" href="{% url 'memberships:membership_list' %}">
+            <i class="bi bi-card-checklist"></i> Memberships
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'attendance' %}active{% endif %}" href="{% url 'attendance:list' %}">
+            <i class="bi bi-calendar-check-fill"></i> Attendance
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'payments' %}active{% endif %}" href="{% url 'payments:list' %}">
+            <i class="bi bi-cash-coin"></i> Payments
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'classes' %}active{% endif %}" href="{% url 'classes:list' %}">
+            <i class="bi bi-heart-pulse-fill"></i> Classes
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'equipment' %}active{% endif %}" href="{% url 'equipment:list' %}">
+            <i class="bi bi-tools"></i> Equipment
+        </a>
+
+        <div class="nav-section">Insights</div>
+        <a class="nav-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}" href="{% url 'reports:home' %}">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i> Reports
+        </a>
+        <a class="nav-link {% if request.resolver_match.namespace == 'notifications' %}active{% endif %}" href="{% url 'notifications:list' %}">
+            <i class="bi bi-bell-fill"></i> Notifications
+        </a>
+
+        {% if user.is_super_admin or user.is_manager %}
+        <div class="nav-section">Administration</div>
+        <a class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}" href="{% url 'accounts:user_list' %}">
+            <i class="bi bi-person-gear"></i> Users
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'dashboard:settings' %}">
+            <i class="bi bi-gear-fill"></i> Settings
+        </a>
+        <a class="nav-link" href="/admin/">
+            <i class="bi bi-shield-lock-fill"></i> Admin Panel
+        </a>
+        {% endif %}
+    </nav>
+</aside>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h4 class="page-title mb-0">Notifications</h4>
+    <div>
+        <a href="{% url 'notifications:mark_all_read' %}" class="btn btn-outline-secondary btn-sm">Mark all read</a>
+        {% if user.is_super_admin or user.is_manager %}
+        <a href="{% url 'notifications:create' %}" class="btn btn-primary btn-sm"><i class="bi bi-megaphone me-1"></i>Send</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <ul class="list-group list-group-flush">
+        {% for n in notifications %}
+        <li class="list-group-item d-flex align-items-start gap-3 {% if not n.is_read %}bg-light{% endif %}">
+            <div class="text-primary fs-4"><i class="bi bi-bell-fill"></i></div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                    <h6 class="mb-1">{{ n.title }}
+                        {% if not n.is_read %}<span class="badge bg-primary ms-1">New</span>{% endif %}
+                        <span class="badge bg-secondary-subtle text-secondary">{{ n.get_notification_type_display }}</span>
+                    </h6>
+                    <small class="text-muted">{{ n.created_at|timesince }} ago</small>
+                </div>
+                <p class="mb-1 text-muted small">{{ n.message }}</p>
+                {% if not n.is_read %}<a href="{% url 'notifications:mark_read' n.pk %}" class="small">Mark as read</a>{% endif %}
+            </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center text-muted py-5">
+            <i class="bi bi-bell-slash d-block mb-2" style="font-size:2rem;"></i>No notifications.
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

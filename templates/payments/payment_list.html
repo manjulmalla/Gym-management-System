@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Payments{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h4 class="page-title mb-0">Payments</h4>
+    <a href="{% url 'payments:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Record Payment</a>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><div class="value text-success">${{ total_paid|floatformat:0|intcomma }}</div><div class="label">Total Collected</div></div>
+                <div class="icon bg-grad-green"><i class="bi bi-cash-stack"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card stat-card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><div class="value text-warning">${{ total_pending|floatformat:0|intcomma }}</div><div class="label">Pending</div></div>
+                <div class="icon bg-grad-orange"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2">
+        <div class="col-md-6"><input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Search by member or invoice..."></div>
+        <div class="col-md-4">
+            <select name="status" class="form-select">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filter</button></div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Invoice</th><th>Member</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                {% for p in page_obj %}
+                <tr>
+                    <td class="fw-semibold">{{ p.invoice_number }}</td>
+                    <td>{{ p.member.full_name }}</td>
+                    <td>${{ p.amount }}</td>
+                    <td>{{ p.get_method_display }}</td>
+                    <td>
+                        {% if p.status == 'paid' %}<span class="badge bg-success-subtle text-success">Paid</span>
+                        {% elif p.status == 'pending' %}<span class="badge bg-warning-subtle text-warning">Pending</span>
+                        {% else %}<span class="badge bg-secondary-subtle text-secondary">Refunded</span>{% endif %}
+                    </td>
+                    <td>{{ p.date }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'payments:receipt' p.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-receipt"></i></a>
+                        <a href="{% url 'payments:invoice_pdf' p.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-file-pdf"></i></a>
+                        <a href="{% url 'payments:edit' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% empty %}<tr><td colspan="7" class="text-center text-muted py-4">No payments found.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="p-3">{% with querystring="q="|add:query|add:"&status="|add:status %}{% include "partials/pagination.html" %}{% endwith %}</div>
+</div>
+{% endblock %}

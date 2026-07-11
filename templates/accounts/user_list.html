@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h4 class="page-title mb-0">User Management</h4>
+    <a href="{% url 'accounts:user_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add User</a>
+</div>
+
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2">
+        <div class="col-md-6">
+            <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Search by name or username...">
+        </div>
+        <div class="col-md-4">
+            <select name="role" class="form-select">
+                <option value="">All roles</option>
+                <option value="super_admin" {% if role == 'super_admin' %}selected{% endif %}>Super Admin</option>
+                <option value="manager" {% if role == 'manager' %}selected{% endif %}>Gym Manager</option>
+                <option value="trainer" {% if role == 'trainer' %}selected{% endif %}>Trainer</option>
+                <option value="receptionist" {% if role == 'receptionist' %}selected{% endif %}>Receptionist</option>
+                <option value="member" {% if role == 'member' %}selected{% endif %}>Member</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td class="fw-semibold">{{ u.username }}</td>
+                    <td>{{ u.get_full_name|default:"-" }}</td>
+                    <td>{{ u.email|default:"-" }}</td>
+                    <td><span class="badge bg-info-subtle text-info">{{ u.role_label }}</span></td>
+                    <td>
+                        {% if u.is_active %}<span class="badge bg-success-subtle text-success">Active</span>
+                        {% else %}<span class="badge bg-secondary-subtle text-secondary">Inactive</span>{% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'accounts:user_delete' u.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No users found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

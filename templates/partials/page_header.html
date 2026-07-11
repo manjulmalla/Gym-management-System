@@ -1,0 +1,8 @@
+{% comment %}Reusable page header. Set `page_heading`, `page_subtitle` and block `page_actions`.{% endcomment %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="page-title mb-0">{{ page_heading }}</h4>
+        {% if page_subtitle %}<small class="text-muted">{{ page_subtitle }}</small>{% endif %}
+    </div>
+    <div>{% block page_actions %}{% endblock %}</div>
+</div>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ workout_class.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="page-title mb-0">{{ workout_class.name }}</h4>
+    <div>
+        {% if not workout_class.is_full %}
+        <a href="{% url 'classes:enroll' workout_class.pk %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Enroll Member</a>
+        {% endif %}
+        <a href="{% url 'classes:list' %}" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card p-4">
+            <span class="badge bg-primary-subtle text-primary mb-2">{{ workout_class.get_class_type_display }}</span>
+            <table class="table table-sm">
+                <tr><th>Trainer</th><td>{{ workout_class.trainer.full_name|default:"-" }}</td></tr>
+                <tr><th>Day</th><td>{{ workout_class.get_day_display }}</td></tr>
+                <tr><th>Time</th><td>{{ workout_class.start_time }}–{{ workout_class.end_time }}</td></tr>
+                <tr><th>Capacity</th><td>{{ workout_class.enrolled_count }}/{{ workout_class.capacity }}</td></tr>
+                <tr><th>Seats Left</th><td>{{ workout_class.seats_left }}</td></tr>
+            </table>
+            {% if workout_class.description %}<p class="text-muted small mb-0">{{ workout_class.description }}</p>{% endif %}
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card p-4">
+            <h6 class="mb-3">Enrolled Members ({{ enrollments|length }})</h6>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for en in enrollments %}
+                        <tr><td>{{ en.member.full_name }}</td><td>{{ en.member.membership_id }}</td>
+                            <td class="text-end"><a href="{% url 'members:detail' en.member.pk %}">View</a></td></tr>
+                        {% empty %}<tr><td class="text-center text-muted py-3">No members enrolled yet.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

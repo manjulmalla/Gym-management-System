@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Monthly Attendance{% endblock %}
+
+{% block content %}
+<h4 class="page-title mb-4">Monthly Attendance Report</h4>
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2">
+        <div class="col-md-5">
+            <input type="number" name="year" value="{{ year }}" class="form-control" placeholder="Year">
+        </div>
+        <div class="col-md-5">
+            <input type="number" name="month" value="{{ month }}" min="1" max="12" class="form-control" placeholder="Month">
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary">View</button></div>
+    </form>
+</div>
+
+<div class="card p-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h6 class="mb-0">Daily Check-ins — {{ month }}/{{ year }}</h6>
+        <span class="badge bg-primary-subtle text-primary">Total: {{ total }}</span>
+    </div>
+    <canvas id="monthChart" height="90"></canvas>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    new Chart(document.getElementById("monthChart"), {
+        type: "bar",
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{ label: "Check-ins", data: {{ data|safe }}, backgroundColor: "#2563eb", borderRadius: 5 }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+</script>
+{% endblock %}
